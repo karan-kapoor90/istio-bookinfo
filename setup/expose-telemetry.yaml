@@ -1,0 +1,200 @@
+##################################################################################################
+# Expose Grafana
+##################################################################################################
+
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: bookinfo-grafana-gateway
+  namespace: istio-system
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 15031
+      name: bookinfo-grafana-port
+      protocol: HTTP
+    hosts:
+    - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: bookinfo-grafana-vs
+  namespace: istio-system
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - bookinfo-grafana-gateway
+  http:
+  - match:
+    - port: 15031
+    route:
+    - destination:
+        host: bookinfo-grafana
+        port:
+          number: 3000
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: bookinfo-grafana
+  namespace: istio-system
+spec:
+  host: bookinfo-grafana
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+
+##################################################################################################
+# Expose Jaeger Tracing
+##################################################################################################
+
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: tracing-gateway
+  namespace: istio-system
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 15032
+      name: http-tracing
+      protocol: HTTP
+    hosts:
+    - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: tracing-vs
+  namespace: istio-system
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - tracing-gateway
+  http:
+  - match:
+    - port: 15032
+    route:
+    - destination:
+        host: tracing
+        port:
+          number: 80
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: tracing
+  namespace: istio-system
+spec:
+  host: tracing
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+##################################################################################################
+# Expose Service Graph
+##################################################################################################
+
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: bookinfo-servicegraph-gateway
+  namespace: istio-system
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 15033
+      name: bookinfo-servicegraph-port
+      protocol: HTTP
+    hosts:
+    - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: bookinfo-servicegraph-vs
+  namespace: istio-system
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - bookinfo-servicegraph-gateway
+  http:
+  - match:
+    - port: 15033
+    route:
+    - destination:
+        host: bookinfo-servicegraph-tracing
+        port:
+          number: 8088
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: bookinfo-servicegraph-tracing
+  namespace: istio-system
+spec:
+  host: bookinfo-servicegraph
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+##################################################################################################
+# Expose Prometheus
+##################################################################################################
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: bookinfo-prometheus-gateway
+  namespace: istio-system
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 15030
+      name: http-prom
+      protocol: HTTP
+    hosts:
+    - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: bookinfo-prometheus-vs
+  namespace: istio-system
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - bookinfo-prometheus-gateway
+  http:
+  - match:
+    - port: 15030
+    route:
+    - destination:
+        host: bookinfo-prometheus-dr
+        port:
+          number: 9090
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: bookinfo-prometheus-dr
+  namespace: istio-system
+spec:
+  host: prometheus
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
