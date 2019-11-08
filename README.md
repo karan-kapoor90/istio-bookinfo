@@ -1,10 +1,20 @@
+# Installation:
+
+1. Run all the scripts in the setup folder
+
+# Explore telemetry
+
 1. Navigate to Load balancer URL on console:
+
 https://console.us-ashburn-1.oraclecloud.com/load-balancer/load-balancers/ocid1.loadbalancer.oc1.iad.aaaaaaaahm33phaw7rl3zd5j4keirx7edz253q3shckmeih2iezqxnmps2cq
 
+or get the istio-ingressgateway external IP (automatically mapped to OCI LB Public IP)
+
+export INGRESS_HOST=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 
 2. Open the productpage
 
-http://129.213.15.82/productpage
+explorer http://$INGRESS_HOST/productpage
 
 3. Apply Header based routing:
 cd  cd header-based-routing/
@@ -26,28 +36,28 @@ Telemetry Demonstration:
 1. Kubernetes dashboard:
 kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep oke-admin | awk '{print $1}')
 kubectl proxy
-http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/#!/login
+explorer http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/#!/login
 
 2. Generate Load:
 
 while true; do
-  curl -s https://2886795267-80-ollie02.environments.katacoda.com/productpage > /dev/null
+  curl -s http://$INGRESS_HOST/productpage > /dev/null
   echo -n .;
   sleep 0.2
 done
 
 3. Grafana Dashboard:
-http://129.213.15.82:15031/dashboard/db/istio-mesh-dashboard
+explorer http://$INGRESS_HOST:15031/dashboard/db/istio-mesh-dashboard
 
 4. Jaeger dashboard:
-http://129.213.15.82:15032/
+explorer http://$INGRESS_HOST:15032/
 
 5. Proxy expose Kiali:
 kubectl port-forward $(kubectl get po -n istio-system -l app=kiali -o jsonpath={.items..metadata.name}) 20001 -n istio-system
 (admin/admin)
-http://localhost:20001
+explorer http://localhost:20001
 
 
 6. Weave Dashboard:
 kubectl port-forward $(kubectl get po -n weave --selector=name=weave-scope-app -o jsonpath={.items..metadata.name}) 4040 -n weave
-http://localhost:4040
+explorer http://localhost:4040
