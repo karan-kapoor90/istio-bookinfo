@@ -8,15 +8,17 @@ Note: The following setup runs on the bash shell so your best bet would be to us
 
 1. Navigate to Load balancer URL on console:
 
-    ```bash
-    https://console.us-ashburn-1.oraclecloud.com/load-balancer/load-balancers/ocid1.loadbalancer.oc1.iad.aaaaaaaahm33phaw7rl3zd5j4keirx7edz253q3shckmeih2iezqxnmps2cq
-    ```
+```bash
+https://console.us-ashburn-1.oraclecloud.com/load-balancer/load-balancers/ocid1.loadbalancer.oc1.iad.aaaaaaaahm33phaw7rl3zd5j4keirx7edz253q3shckmeih2iezqxnmps2cq
+```
 
-or get the istio-ingressgateway external IP (automatically mapped to OCI LB Public IP)
+or get the istio-ingressgateway external IP (automatically mapped to OCI LB Public IP):
 
-    ```bash
-    export INGRESS_HOST=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-    ```
+
+```bash
+export INGRESS_HOST=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+```
+
 
 2. Open the productpage
 
