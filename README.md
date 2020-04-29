@@ -1,5 +1,7 @@
 # Installation/ Setup:
 
+![CI](https://github.com/karan-kapoor90/istio-bookinfo/workflows/CI/badge.svg?branch=master)
+
 1. Run all the scripts in the setup folder
 
 Note: The following setup runs on the bash shell so your best bet would be to use Git bash on windows.
